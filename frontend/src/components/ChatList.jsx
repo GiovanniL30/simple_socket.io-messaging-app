@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChatBlock from "./ChatBlock";
 import { useUserContext } from "../UserContext";
 
 const ChatList = ({ socket }) => {
   const { user } = useUserContext();
   const [messages, setMessages] = useState([]);
+  const scroll = useRef(null);
 
   useEffect(() => {
     socket.on("message", (message) => {
       setMessages((prev) => [...prev, message]);
+
+      if (scroll.current) {
+        scroll.current.scrollIntoView({ behavior: "smooth" });
+      }
     });
     return () => {
       socket.off("message");
@@ -24,6 +29,7 @@ const ChatList = ({ socket }) => {
           sender={message.sender}
         />
       ))}
+      <div ref={scroll}></div>
     </div>
   );
 };
